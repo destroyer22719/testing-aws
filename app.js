@@ -4,7 +4,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.get('', (req, res) => {
-  res.send('deployed from elastic deploy')
+  res.send('version should work with tag')
 })
 
 app.listen(port, () => {
