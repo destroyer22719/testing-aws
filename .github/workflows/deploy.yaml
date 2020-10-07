@@ -14,6 +14,11 @@ jobs:
 
     - name: Generate deployment package
       run: zip -r deploy.zip * -x "**node_modules**"
+    
+    - name: Extract tagname
+        shell: bash
+        run: echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/tags/})"
+        id: extract_tag
       
     - name: Deploy to EB
       uses: einaregilsson/beanstalk-deploy@v13
@@ -22,6 +27,6 @@ jobs:
         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         application_name: Basic-Node-Test 
         environment_name: BasicNodeTest-env
-        version_label: ${{ github.ref##*/ }}
+        version_label: ${{ steps.extract_tag.outputs.tag }}
         region: us-west-2
         deployment_package: deploy.zip
