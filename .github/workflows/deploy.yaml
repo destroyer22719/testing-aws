@@ -5,15 +5,18 @@ on:
     - 'v*.*.*'
     
 jobs:
-  get-tag:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v1
-      - name: Set env
-        run: |
-        echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
-        echo $(RELEASE_VERSION)
-        echo $(${GITHUB_REF:10})
+      - name: Extract tag name
+        id: tag
+        uses: actions/github-script@0.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            return context.payload.ref.replace(/\/refs\/tags\//, '');
+      - name: Echo
+        run: echo ${{ steps.tag.outputs.result }}
   build:
     runs-on: ubuntu-latest
     steps:
@@ -31,6 +34,6 @@ jobs:
         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         application_name: MyApplicationName
         environment_name: MyApplication-Environment
-        version_label: :${{GITHUB_REF:10}}
+        version_label: :${{ steps.tag.outputs.result }}
         region: us-west-2
         deployment_package: deploy.zip
